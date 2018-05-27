@@ -1,56 +1,22 @@
 'use strict';
 
-
-// var RankingItem = function (text) {
-//   if (text) {
-//     var o = JSON.parse(text);
-//     this.balance = o.balance;
-//     this.author = o.author;
-//   } 
-// };
-
-// RankingItem.prototype = {
-//   toString: function () {
-//     return JSON.stringify(this);
-//   }
-// };
-
-var Pool = function(text) {
-  if (text) {
-    var o = JSON.parse(text);
-    this.balance = new BigNumber(o.balance);
-  } else {
-    this.balance = new BigNumber(0);
-  }
-  var topPrize = new BigNumber(0.007);
-  var secPrize = new BigNumber(0.003);
-  var thrPrize = new BigNumber(0.002);
-  this.prizes = [secPrize, thrPrize, thrPrize, thrPrize, secPrize, topPrize];
-}
-
-Pool.prototype = {
-  toString: function () {
-    return JSON.stringify(this);
-  }
-};
-
 var SlotMachine = function () {
-  LocalContractStorage.set("testBalance", new BigNumber(0));
-  // LocalContractStorage.defineMapProperty(this, "pool", {
-  //   parse: function (text) {
-  //     return new Pool(text);
-  //   },
-  //   stringify: function (o) {
-  //     return o.toString();
-  //   }
-  // });
+  LocalContractStorage.defineProperty(this, "balance", {
+    stringify: function (obj) {
+        return obj.toString();
+    },
+    parse: function (str) {
+        return new BigNumber(str);
+    }
+  });
+  LocalContractStorage.defineProperty(this, "prizes", null);
 };
 
 // save value to contract, only after height of block, users can takeout
 SlotMachine.prototype = {
   init: function (balance) {
     Math.random.seed("I am a fucking genuis. ~~");
-    this.pool.balance = new BigNumber(balance);
+    this.prizes = 
   },
 
   spin: function () {
