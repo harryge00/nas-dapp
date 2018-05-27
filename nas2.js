@@ -26,6 +26,11 @@ SlotMachine.prototype = {
     var prizes = [secPrize, thrPrize, thrPrize, thrPrize, secPrize, topPrize];
     var from = Blockchain.transaction.from;
     var value = Blockchain.transaction.value;
+    var result = {
+      "fromValue": value,
+      "prize": 0
+    };
+
     balance.plus(value);
     if(value.lt(0.001)) {
       LocalContractStorage.set("balance", balance.toNumber());
@@ -44,12 +49,15 @@ SlotMachine.prototype = {
       var res = Blockchain.transfer(address, prize);
       if(!res) {
         console.log("Transaction failed!");
+        result.failed = true;
       }
       balance.minus(prize);
       LocalContractStorage.set("balance", balance.toNumber());
+      result.prize = prize;
       
     }
-    return arr;
+    result.slots = arr;
+    return result;
   },
 
   balanceOf: function () {
