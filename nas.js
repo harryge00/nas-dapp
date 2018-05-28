@@ -126,7 +126,9 @@ SlotMachine.prototype = {
     }
     return this.pool.prizes[i];
   },
+  claim: function(){
 
+  },
   verifyAddress: function (address) {
     // 1-valid, 0-invalid
     var result = Blockchain.verifyAddress(address);

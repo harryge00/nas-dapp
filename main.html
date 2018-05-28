@@ -12,6 +12,10 @@
     <script src="./js/jquery.slotmachine.js"></script>
     <script src="./js/highlight.min.js"></script>
     <script src="./js/javascript.min.js"></script>
+    <script type="text/javascript" src="./js/nebPay.js"></script>
+    <script type="text/javascript">
+
+      </script>
     <script defer="" src="./js/all.js"></script>
 </head>
 
@@ -70,68 +74,106 @@
       </div>
     </div>
     <script id="codeScript5">
-    let count = 0;
-    const btnShuffle = document.querySelector('#casinoShuffle');
-    const btnStop = document.querySelector('#casinoStop');
-    const casino1 = document.querySelector('#casino1');
-    const casino2 = document.querySelector('#casino2');
-    const casino3 = document.querySelector('#casino3');
-    const mCasino1 = new SlotMachine(casino1, {
-      active: 0,
-      delay: 500
-    });
-    const mCasino2 = new SlotMachine(casino2, {
-      active: 1,
-      delay: 500
-    });
-    const mCasino3 = new SlotMachine(casino3, {
-      active: 2,
-      delay: 500
-    });
-        </script>
-        <script id="codeScript6">
-        var result = [-1, -1, -1];
-    btnShuffle.addEventListener('click', () => {
-      count = 3;
-      mCasino1.shuffle(99999);
-      mCasino2.shuffle(99999);
-      mCasino3.shuffle(99999);
-    });
-
-    btnStop.addEventListener('click', () => {
-      switch(count) {
-        case 3:
-          mCasino1.stop(function() {
-            console.log(1, mCasino1.active);
-            result[0] = mCasino1.active;
+      var NebPay = require("nebpay");
+      var nebPay = new NebPay();
+      var serialNumber;
+      var intervalQuery;
+      //var callbackUrl = NebPay.config.mainnetUrl;
+      var callbackUrl = NebPay.config.testnetUrl;
+      var toAddr = "n21XtnUtaLaPi17ssnjpnjT34CXwE79Z8pb";
+      function onPayClick() {
+          serialNumber = nebPay.pay(toAddr, 0.001, "spin", "", {
+              goods: {
+                  name: "Lucky 7 Slot Machine ",
+                  desc: "Win money if the 3 slots are same"
+              },
+              callback:callbackUrl
           });
-          break;
-        case 2:
-          mCasino2.stop(function() {
-            console.log(2, mCasino2.active);
-            result[1] = mCasino2.active;
-          });
-          break;
-        case 1:
-          mCasino3.stop(function() {
-            console.log(3, mCasino3.active);
-            if(result[0] >= 0 && result[0] == mCasino3.active && result[1] == mCasino3.active) {
-              switch(mCasino3.active) {
-                case 6:
-                  console.log("Lucky 7!!!");
-                  break;
-                default:
-                  console.log("Con!");
-              }
-              result[0] = -1;
-              result[1] = -1;
-            }
-
-          });
-          break;
+          //Set a periodically query
+          intervalQuery = setInterval(function() {
+              funcIntervalQuery();
+          }, 3000); //it's recommended that the query frequency is between 10-15s.
       }
-      count--;
-    });
-        </script>
+       //Query the result of the transaction. queryPayInfo returns a Promise object.
+      function funcIntervalQuery() {   
+          nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
+              .then(function (resp) {
+                  console.log("tx result: " + resp);   //resp is a JSON string
+                  var respObject = JSON.parse(resp);
+                  console.log(respObject.slots);
+                  if(respObject.code === 0){
+                      //The transaction is successful 
+                      
+                      clearInterval(intervalQuery)    //stop the periodically query 
+                  }
+              })
+              .catch(function (err) {
+                  console.log(err);
+              });
+      }
+      let count = 0;
+      const btnShuffle = document.querySelector('#casinoShuffle');
+      const btnStop = document.querySelector('#casinoStop');
+      const casino1 = document.querySelector('#casino1');
+      const casino2 = document.querySelector('#casino2');
+      const casino3 = document.querySelector('#casino3');
+      const mCasino1 = new SlotMachine(casino1, {
+        active: 0,
+        delay: 500
+      });
+      const mCasino2 = new SlotMachine(casino2, {
+        active: 1,
+        delay: 500
+      });
+      const mCasino3 = new SlotMachine(casino3, {
+        active: 2,
+        delay: 500
+      });
+          </script>
+          <script id="codeScript6">
+          var result = [-1, -1, -1];
+      btnShuffle.addEventListener('click', () => {
+        onPayClick();
+        count = 3;
+        mCasino1.shuffle(99999);
+        mCasino2.shuffle(99999);
+        mCasino3.shuffle(99999);
+      });
+
+      btnStop.addEventListener('click', () => {
+        switch(count) {
+          case 3:
+            mCasino1.stop(function() {
+              console.log(1, mCasino1.active);
+              result[0] = mCasino1.active;
+            });
+            break;
+          case 2:
+            mCasino2.stop(function() {
+              console.log(2, mCasino2.active);
+              result[1] = mCasino2.active;
+            });
+            break;
+          case 1:
+            mCasino3.stop(function() {
+              console.log(3, mCasino3.active);
+              if(result[0] >= 0 && result[0] == mCasino3.active && result[1] == mCasino3.active) {
+                switch(mCasino3.active) {
+                  case 6:
+                    console.log("Lucky 7!!!");
+                    break;
+                  default:
+                    console.log("Con!");
+                }
+                result[0] = -1;
+                result[1] = -1;
+              }
+
+            });
+            break;
+        }
+        count--;
+      });
+    </script>
 </body>
 </html>

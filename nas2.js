@@ -19,9 +19,9 @@ SlotMachine.prototype = {
   },
 
   spin: function () {
-    var topPrize = new BigNumber(0.007);
-    var secPrize = new BigNumber(0.003);
-    var thrPrize = new BigNumber(0.002);
+    var topPrize = new BigNumber(7000000000000000);
+    var secPrize = new BigNumber(3000000000000000);
+    var thrPrize = new BigNumber(2000000000000000);
     var balance = new BigNumber(LocalContractStorage.get("balance"));
     var prizes = [secPrize, thrPrize, thrPrize, thrPrize, secPrize, topPrize];
     var from = Blockchain.transaction.from;
@@ -32,7 +32,7 @@ SlotMachine.prototype = {
     };
 
     balance.plus(value);
-    if(value.lt(0.001)) {
+    if(value.lt(1000000000000000)) {
       LocalContractStorage.set("balance", balance.toNumber());
       throw new Error("Insufficient nas to play!");
     }
@@ -64,14 +64,28 @@ SlotMachine.prototype = {
     return LocalContractStorage.get("balance");
   },
   add: function(i) {
-    if(i > 0.000000001) {
+    if(i > 0) {
       var balance = new BigNumber(LocalContractStorage.get("balance"));
       balance.plus(i);
       LocalContractStorage.set("balance", balance.toNumber());
     }
     return balance.toNumber();
   },
-  
+  claim: function() {
+    var balance = new BigNumber(LocalContractStorage.get("balance"));
+    var res = {
+      failed: true
+    };
+    if(balance.gt(100000000000000000)) {
+      var res = Blockchain.transfer("n1GHASp6Pku4D35hvgGipS3Pjt2iX7uYhBZ", balance);
+      if(!res) {
+        console.log("Transaction failed!");
+      } else {
+        res.failed = false;
+      }
+    }
+    return res;
+  },
 
   verifyAddress: function (address) {
     // 1-valid, 0-invalid
