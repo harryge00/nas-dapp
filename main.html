@@ -82,7 +82,7 @@
       var callbackUrl = NebPay.config.testnetUrl;
       var toAddr = "n21XtnUtaLaPi17ssnjpnjT34CXwE79Z8pb";
       function onPayClick() {
-          serialNumber = nebPay.pay(toAddr, 0.001, "spin", "", {
+          serialNumber = nebPay.call(toAddr, 0.001, "spin", "", {
               goods: {
                   name: "Lucky 7 Slot Machine ",
                   desc: "Win money if the 3 slots are same"
