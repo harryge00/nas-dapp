@@ -92,7 +92,7 @@
           //Set a periodically query
           intervalQuery = setInterval(function() {
               funcIntervalQuery();
-          }, 3000); //it's recommended that the query frequency is between 10-15s.
+          }, 10000); //it's recommended that the query frequency is between 10-15s.
       }
        //Query the result of the transaction. queryPayInfo returns a Promise object.
       function funcIntervalQuery() {   
