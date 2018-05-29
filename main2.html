@@ -12,7 +12,7 @@
     <script src="./js/jquery.slotmachine.js"></script>
     <script src="./js/highlight.min.js"></script>
     <script src="./js/javascript.min.js"></script>
-    <script type="text/javascript" src="./js/nebPay.js"></script>
+    <script type="text/javascript" src="./js/nebulas.js"></script>
     <script type="text/javascript">
 
       </script>
@@ -77,48 +77,33 @@
       </div>
     </div>
     <script id="codeScript5">
-      var NebPay = require("nebpay");
-      var nebPay = new NebPay();
+      var nebulas = require("nebulas");
+      var neb = new nebulas.Neb();
+      var fromAddr = "n1TyyZLyvsVsoJDpnBzJ2tZWgAdF8zF5NEj";
+      var gasPrice = "1000000";
+      var gasLimit = "2000000";
       var serialNumber;
       var intervalQuery;
       //var callbackUrl = NebPay.config.mainnetUrl;
-      var callbackUrl = NebPay.config.testnetUrl;
+      neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
       var toAddr = "n21XtnUtaLaPi17ssnjpnjT34CXwE79Z8pb";
-      function listener(resp) {
+      function lister(resp) {
         console.log("resp: " + JSON.stringify(resp))
         document.getElementById("spinResult").value = JSON.stringify(resp)
       }
       function onPayClick() {
-          serialNumber = nebPay.call(toAddr, 0.001, "spin", "", {
-              goods: {
-                  name: "Lucky 7 Slot Machine ",
-                  desc: "Win money if the 3 slots are same"
-              },
-              listener: listener,
-              callback:callbackUrl
+          neb.api.call(fromAddr, toAddr, 0.001, 0, gasPrice, gasLimit, {
+            function: "spin",
+            args: "[]"
+          }).then(function(resp){
+            console.log(resp);
+            var result = resp.result;
+            result = JSON.parse(result);
+            document.getElementById("spinResult").value = result;
           });
-          //Set a periodically query
-          intervalQuery = setInterval(function() {
-              funcIntervalQuery();
-          }, 10000); //it's recommended that the query frequency is between 10-15s.
       }
        //Query the result of the transaction. queryPayInfo returns a Promise object.
-      function funcIntervalQuery() {   
-          nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
-              .then(function (resp) {
-                  console.log("tx result: " + resp);   //resp is a JSON string
-                  var respObject = JSON.parse(resp);
-                  console.log(respObject.slots);
-                  if(respObject.code === 0){
-                      //The transaction is successful 
-                      
-                      clearInterval(intervalQuery)    //stop the periodically query 
-                  }
-              })
-              .catch(function (err) {
-                  console.log(err);
-              });
-      }
+      
       let count = 0;
       const btnShuffle = document.querySelector('#casinoShuffle');
       const btnStop = document.querySelector('#casinoStop');
