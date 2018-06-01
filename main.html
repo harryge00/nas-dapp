@@ -4,24 +4,21 @@
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="./css/style.css" type="text/css" media="screen">
     <link rel="stylesheet" href="./css/jquery.slotmachine.css" type="text/css" media="screen">
+    <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="./js/jquery-3.2.1.slim.min.js"></script>
-    <script src="./js/popper.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.slim.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="./js/slotmachine.js"></script>
     <script src="./js/jquery.slotmachine.js"></script>
     <script src="./js/highlight.min.js"></script>
     <script src="./js/javascript.min.js"></script>
     <script type="text/javascript" src="./js/nebPay.js"></script>
-    <script type="text/javascript">
-
-      </script>
     <script defer="" src="./js/all.js"></script>
 </head>
 
   <body>    
     <title>Lucky 7</title>
-    <!-- Slot machine example -->
     <div id="casino" style="padding-top:50px;">
       <div class="content">
         <h1>Lucky 7</h1>
@@ -56,7 +53,6 @@
 
           <div class="btn-group btn-group-justified" role="group">
             <button id="casinoShuffle" type="button" class="btn btn-primary btn-lg">Shuffle!</button>
-            <button id="casinoStop" type="button" class="btn btn-primary btn-lg">Stop!</button>
           </div>
           <div>
             <p id="spinResult"></p>
@@ -64,62 +60,27 @@
         </div>
       </div>
 
-      <div class="container">
-        <div class="row">
-          <div class="col-sm-10 col-md-5 offset-sm-1 offset-md-1">
-            <pre><code id="codeBlock5"></code></pre>
-          </div>
-
-          <div class="col-sm-10 col-md-5 offset-sm-1 offset-md-0">
-            <pre><code id="codeBlock6"></code></pre>
+     
+      <div class="modal fade" id="prizeModal" tabindex="-1" role="dialog" aria-labelledby="prizeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="prizeModalLabel">You win <spin id="winPrize"></spin> nas!</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              It will send to your account by the smart contract. If not, please contact harryge@qq.com.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <script id="codeScript5">
-      var NebPay = require("nebpay");
-      var nebPay = new NebPay();
-      var serialNumber;
-      var intervalQuery;
-      //var callbackUrl = NebPay.config.mainnetUrl;
-      var callbackUrl = NebPay.config.testnetUrl;
-      var toAddr = "n21XtnUtaLaPi17ssnjpnjT34CXwE79Z8pb";
-      function listener(resp) {
-        console.log("resp: " + JSON.stringify(resp))
-        document.getElementById("spinResult").value = JSON.stringify(resp)
-      }
-      function onPayClick() {
-          serialNumber = nebPay.call(toAddr, 0.001, "spin", "", {
-              goods: {
-                  name: "Lucky 7 Slot Machine ",
-                  desc: "Win money if the 3 slots are same"
-              },
-              listener: listener,
-              callback:callbackUrl
-          });
-          //Set a periodically query
-          intervalQuery = setInterval(function() {
-              funcIntervalQuery();
-          }, 10000); //it's recommended that the query frequency is between 10-15s.
-      }
-       //Query the result of the transaction. queryPayInfo returns a Promise object.
-      function funcIntervalQuery() {   
-          nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
-              .then(function (resp) {
-                  console.log("tx result: " + resp);   //resp is a JSON string
-                  var respObject = JSON.parse(resp);
-                  console.log(respObject.slots);
-                  if(respObject.code === 0){
-                      //The transaction is successful 
-                      
-                      clearInterval(intervalQuery)    //stop the periodically query 
-                  }
-              })
-              .catch(function (err) {
-                  console.log(err);
-              });
-      }
-      let count = 0;
       const btnShuffle = document.querySelector('#casinoShuffle');
       const btnStop = document.querySelector('#casinoStop');
       const casino1 = document.querySelector('#casino1');
@@ -137,51 +98,87 @@
         active: 2,
         delay: 500
       });
-          </script>
-          <script id="codeScript6">
-          var result = [-1, -1, -1];
       btnShuffle.addEventListener('click', () => {
         onPayClick();
-        count = 3;
         mCasino1.shuffle(99999);
         mCasino2.shuffle(99999);
         mCasino3.shuffle(99999);
       });
 
-      btnStop.addEventListener('click', () => {
-        switch(count) {
-          case 3:
-            mCasino1.stop(function() {
-              console.log(1, mCasino1.active);
-              result[0] = mCasino1.active;
-            });
-            break;
-          case 2:
-            mCasino2.stop(function() {
-              console.log(2, mCasino2.active);
-              result[1] = mCasino2.active;
-            });
-            break;
-          case 1:
-            mCasino3.stop(function() {
-              console.log(3, mCasino3.active);
-              if(result[0] >= 0 && result[0] == mCasino3.active && result[1] == mCasino3.active) {
-                switch(mCasino3.active) {
-                  case 6:
-                    console.log("Lucky 7!!!");
-                    break;
-                  default:
-                    console.log("Con!");
-                }
-                result[0] = -1;
-                result[1] = -1;
-              }
-
-            });
-            break;
-        }
-        count--;
-      });
+      var NebPay = require("nebpay");
+      var nebPay = new NebPay();
+      var serialNumber;
+      var intervalQuery;
+      //var callbackUrl = NebPay.config.mainnetUrl;
+      var callbackUrl = NebPay.config.testnetUrl;
+      var toAddr = "n21msTLFKy9uFdnvTQAwUZJjg6VdwKJM4Qz";
+      var options = {
+          goods: {
+              name: "Lucky 7 Slot Machine ",
+              desc: "Win money if the 3 slots are same"
+          },
+          callback:callbackUrl
+      };
+      function onPayClick() {
+          serialNumber = nebPay.call(toAddr, 0.001, "spin", "[]", options);
+          //Set a periodically query
+          intervalQuery = setInterval(function() {
+              funcIntervalQuery();
+          }, 10000); //it's recommended that the query frequency is between 10-15s.
+      }
+      //Query the result of the transaction. queryPayInfo returns a Promise object.
+      // {"code":0,"data":{"execute_error":"","gas_price":"1000000","data":"eyJGdW5jdGlvbiI6InNwaW4iLCJBcmdzIjoiW10ifQ==","gas_used":"20356","contract_address":"","type":"call","nonce":37,"gas_limit":"200000","chainId":1001,"from":"n1GHASp6Pku4D35hvgGipS3Pjt2iX7uYhBZ","to":"n21msTLFKy9uFdnvTQAwUZJjg6VdwKJM4Qz","execute_result":"{\"fromValue\":\"1000000000000000\",\"prize\":0,\"slots\":[3,0,4]}","value":"1000000000000000","hash":"02ed848ef7f85f0bc5b32a1306c0297882f393f748ed099c4bd3ab8dfe023121","status":1,"timestamp":1527865082},"msg":"success"}
+      function funcIntervalQuery() {   
+          nebPay.queryPayInfo(serialNumber, options)   //search transaction result from server (result upload to server by app)
+              .then(function (resp) {
+                  console.log("tx result: " + resp);
+                  var respObject = JSON.parse(resp);
+                  console.log(respObject);
+                  if(respObject.data.execute_result) {
+                    var execRes = JSON.parse(respObject.data.execute_result);
+                    var prize = execRes.prize;
+                    var slots = execRes.slots;
+                    console.log("Got res: ", execRes);
+                    if(respObject.code === 0 && slots){
+                      clearInterval(intervalQuery);
+                      stopAll(slots);
+                      if(prize > 0) {
+                        document.getElementById("winPrize").innerHTML = prize;
+                        $('#prizeModal').modal('show');
+                      }
+                    }       
+                  }
+              })
+              .catch(function (err) {
+                  console.log(err);
+              });
+      }
+      function stopAll(slots) {
+        mCasino1.stop(function() {
+          console.log(mCasino1.active);
+          var diff = slots[0] - mCasino1.active;
+          if(diff < 0) {
+            diff += 6;
+          }
+          mCasino1.shuffle(diff);
+        });
+        mCasino2.stop(function() {
+          console.log(mCasino2.active);
+          var diff = slots[0] - mCasino2.active;
+          if(diff < 0) {
+            diff += 6;
+          }
+          mCasino2.shuffle(diff);
+        });
+        mCasino3.stop(function() {
+          console.log(mCasino3.active);
+          var diff = slots[0] - mCasino3.active;
+          if(diff < 0) {
+            diff += 6;
+          }
+          mCasino3.shuffle(diff);
+        });
+      }
     </script>
 </body>
 </html>
