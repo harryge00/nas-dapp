@@ -1,14 +1,6 @@
 'use strict';
 
 var SlotMachine = function () {
-  // LocalContractStorage.defineProperty(this, "balance", {
-  //   stringify: function (obj) {
-  //       return obj.toString();
-  //   },
-  //   parse: function (str) {
-  //       return new BigNumber(str);
-  //   }
-  // });
 };
 
 // save value to contract, only after height of block, users can takeout
@@ -63,14 +55,7 @@ SlotMachine.prototype = {
   balanceOf: function () {
     return LocalContractStorage.get("balance");
   },
-  add: function(i) {
-    if(i > 0) {
-      var balance = new BigNumber(LocalContractStorage.get("balance"));
-      balance.plus(i);
-      LocalContractStorage.set("balance", balance.toNumber());
-    }
-    return balance.toNumber();
-  },
+  
   claim: function() {
     var balance = new BigNumber(LocalContractStorage.get("balance"));
     var res = {
