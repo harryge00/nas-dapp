@@ -1,4 +1,6 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0044)http://josex2r.github.io/jQuery-SlotMachine/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" class="fontawesome-i2svg-active fontawesome-i2svg-complete">
 <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="./css/style.css" type="text/css" media="screen">
     <link rel="stylesheet" href="./css/jquery.slotmachine.css" type="text/css" media="screen">
@@ -97,10 +99,12 @@
         delay: 500
       });
       btnShuffle.addEventListener('click', () => {
-        onPayClick();
         mCasino1.shuffle(99999);
         mCasino2.shuffle(99999);
         mCasino3.shuffle(99999);
+          onPayClick();
+        setTimeout(function(){
+        }, 1000);
       });
 
       var NebPay = require("nebpay");
@@ -118,13 +122,23 @@
           callback:callbackUrl
       };
       function onPayClick() {
-          serialNumber = nebPay.call(toAddr, 0.001, "spin", "[]", options);
-          intervalQuery = setInterval(function() {
-              funcIntervalQuery();
-          }, 10000);
+        var arr = [];
+        for(var i = 0; i < 3; i++) {
+          arr[i] = Math.floor(Math.random() * 6);
+        }
+        console.log(arr);
+        stopAll(arr);
+        if(arr[0] == arr[1] && arr[1] == arr[2]) {
+          var prize = arr[0];
+          console.log("prize");
+          document.getElementById("winPrize").innerHTML = prize;
+          $('#prizeModal').modal('show');
+        }
       }
+      //Query the result of the transaction. queryPayInfo returns a Promise object.
+      // {"code":0,"data":{"execute_error":"","gas_price":"1000000","data":"eyJGdW5jdGlvbiI6InNwaW4iLCJBcmdzIjoiW10ifQ==","gas_used":"20356","contract_address":"","type":"call","nonce":37,"gas_limit":"200000","chainId":1001,"from":"n1GHASp6Pku4D35hvgGipS3Pjt2iX7uYhBZ","to":"n21msTLFKy9uFdnvTQAwUZJjg6VdwKJM4Qz","execute_result":"{\"fromValue\":\"1000000000000000\",\"prize\":0,\"slots\":[3,0,4]}","value":"1000000000000000","hash":"02ed848ef7f85f0bc5b32a1306c0297882f393f748ed099c4bd3ab8dfe023121","status":1,"timestamp":1527865082},"msg":"success"}
       function funcIntervalQuery() {   
-          nebPay.queryPayInfo(serialNumber, options)
+          nebPay.queryPayInfo(serialNumber, options)   //search transaction result from server (result upload to server by app)
               .then(function (resp) {
                   console.log("tx result: " + resp);
                   var respObject = JSON.parse(resp);
@@ -147,6 +161,12 @@
               .catch(function (err) {
                   console.log(err);
               });
+      };
+      function recursiveNext(machine, times) {
+        if(times <= 0) {
+          return;
+        }
+
       }
       function stopAll(slots) {
         mCasino1.nextActive = slots[0];
@@ -155,6 +175,45 @@
         mCasino2.stop();
         mCasino3.nextActive = slots[2];
         mCasino3.stop();
+        
+        // mCasino1.stop(function() {
+        //   console.log(mCasino1.active);
+        //   var diff = slots[0] - mCasino1.active;
+        //   if(diff < 0) {
+        //     diff += 6;
+        //   }
+        //   for(let i = 0; i < diff; i++) {
+        //     mCasino1.next();
+        //   }
+        //   console.log(mCasino1.active, diff);
+        //   // mCasino1.shuffle(diff);
+        // });
+        // mCasino2.stop(function() {
+        //   console.log(mCasino2.active);
+
+        //   var diff = slots[1] - mCasino2.active;
+        //   if(diff < 0) {
+        //     diff += 6;
+        //   }
+        //   for(let i = 0; i < diff; i++) {
+        //     mCasino2.next();
+        //   }
+        //   console.log(mCasino2.active, diff);
+        //   // mCasino2.shuffle(diff);
+        // });
+        // mCasino3.stop(function() {
+        //   console.log(mCasino3.active);
+
+        //   var diff = slots[2] - mCasino3.active;
+        //   if(diff < 0) {
+        //     diff += 6;
+        //   }
+        //   for(let i = 0; i < diff; i++) {
+        //     mCasino3.next();
+        //   }
+        //   console.log(mCasino3.active, diff);
+        //   // mCasino3.shuffle(diff);
+        // });
       }
     </script>
 </body>
