@@ -60,6 +60,7 @@ SuperDictionary.prototype = {
         this.children.put(count, Child);
         count++;
         LocalContractStorage.set("count", count);
+        return count;
     },
 
     get: function (id) {
@@ -72,6 +73,12 @@ SuperDictionary.prototype = {
             result[i] = this.children.get(i);
         }
         return result;
-    }
+    },
+    count: function() {
+        return LocalContractStorage.get("count");
+    },
+    setCount: function(count) {
+        return LocalContractStorage.set("count", count);
+    },
 };
 module.exports = SuperDictionary;
