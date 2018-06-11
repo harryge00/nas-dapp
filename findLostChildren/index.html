@@ -7,7 +7,80 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src=lib/nebulas.js></script>
+    <script>
+      "use strict";
 
+      var dappAddress = "n1m2wWf3Y52zKazhYz57WPBCo5ZLRjVFHkf";
+      //here we use neb.js to call the "get" function to search from the Dictionary
+      var nebulas = require("nebulas"),
+          Account = nebulas.Account,
+          neb = new nebulas.Neb();
+      neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+
+      // 搜索功能: 查找Super-Dictionary 中有没有该词条
+      $("#search").click(function(){
+          // $("#search_value").val() 搜索框内的值
+
+          var from = Account.NewAccount().getAddressString();
+
+          var value = "0";
+          var nonce = "0"
+          var gas_price = "1000000"
+          var gas_limit = "2000000"
+          var callFunction = "list";
+          var contract = {
+              "function": callFunction,
+              "args": []
+          }
+
+          neb.api.call(from, dappAddress,value,nonce,gas_price,gas_limit,contract).then(function (resp) {
+              cbSearch(resp)
+          }).catch(function (err) {
+              console.log("error:" + err.message)
+          })
+      });
+
+      //return of search,
+      function cbSearch(resp) {
+        var result = resp.result    ////resp is an object, resp.result is a JSON string
+        console.log("return of rpc call: " + JSON.stringify(result))
+
+        var resultString = JSON.stringify(result);
+        if(resultString.search("key") !== -1 && resultString.search("value") !== -1){
+            result = JSON.parse(result)
+            $(".add_banner").addClass("hide");
+            $(".result_faile").addClass("hide");
+
+            $("#search_banner").text($("#search_value").val())
+            $("#search_result").text(result.value)
+            $("#search_result_author").text(result.author)
+
+            $(".result_success").removeClass("hide");
+
+        }
+        if(resultString.search('"null"') !== -1){
+            $(".add_banner").addClass("hide");
+            $(".result_success").addClass("hide");
+
+            $("#result_faile_add").text($("#search_value").val())
+
+            $(".result_faile").removeClass("hide");
+
+        }
+        if(resultString.search("error") !== -1){
+            $(".add_banner").addClass("hide");
+            $(".result_faile").addClass("hide");
+
+            $("#search_banner").text($("#search_value").val())
+            $("#search_result").text(result)
+            $("#search_result_author").text("")
+
+            $(".result_success").removeClass("hide");
+
+        }
+      }
+    </script>
     <title>Hello, world!</title>
   </head>
   <body>
@@ -37,7 +110,7 @@
               <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
             <h2>How can I become rich?</h2>
             <p>...Win 100000 NAS</p>
-            <img src="https://csdnimg.cn/pubfooter/images/csdn_cs_qr.png"> 
+            <img src="https://csdnimg.cn/pubfooter/images/csdn_cs_qr.png">
         </div>
       </div>
     </div>

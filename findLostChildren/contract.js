@@ -24,6 +24,7 @@ Child.prototype = {
 };
 
 var SuperDictionary = function () {
+    LocalContractStorage.defineProperty(this, "size");
     LocalContractStorage.defineMapProperty(this, "children", {
         parse: function (text) {
             return new Child(text);
@@ -32,12 +33,11 @@ var SuperDictionary = function () {
             return o.toString();
         }
     });
-    LocalContractStorage.set("count", 0);
 };
 
 SuperDictionary.prototype = {
     init: function () {
-        // todo
+        this.size = 0;
     },
 
     save: function (name, birthyear, contact, place, url) {
@@ -50,35 +50,36 @@ SuperDictionary.prototype = {
         if(birthyear > 2018 || birthyear < 1980) {
             throw new Error("Please check the birth year.")
         }
-        var count = LocalContractStorage.get("count");
+        
         Child = new Child();
         Child.name = name;
         Child.birthyear = birthyear;
         Child.contact = contact;
         Child.place = place;
         Child.url = url;
-        this.children.put(count, Child);
-        count++;
-        LocalContractStorage.set("count", count);
-        return count;
+        this.children.put(this.size, Child);
+        this.size++;
+        return this.size;
     },
 
     get: function (id) {
         return this.children.get(id);
     },
     list: function() {
-        var result = [];
-        var count = LocalContractStorage.get("count");
-        for(var i = 0; i < count; i++) {
-            result[i] = this.children.get(i);
+        var result = {};
+        result.count = this.size;
+        result.array = [];
+        for(var i = 0; i < result.count; i++) {
+            result.array[i] = this.children.get(i);
         }
         return result;
     },
-    count: function() {
-        return LocalContractStorage.get("count");
+    size: function() {
+        return this.size;
     },
-    setCount: function(count) {
-        return LocalContractStorage.set("count", count);
+    setSize: function(size) {
+        this.size = size;
+        return this.size;
     },
 };
 module.exports = SuperDictionary;
