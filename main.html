@@ -9,8 +9,6 @@
     <script src="https://cdn.bootcss.com/popper.js/1.14.3/umd/popper.min.js"></script>
     <script src="./js/slotmachine.js"></script>
     <script src="./js/jquery.slotmachine.js"></script>
-    <script src="./js/highlight.min.js"></script>
-    <script src="./js/javascript.min.js"></script>
     <script type="text/javascript" src="./js/nebPay.js"></script>
     <script defer="" src="./js/all.js"></script>
 </head>
@@ -19,7 +17,7 @@
     <title>摇摇乐</title>
     <div id="casino" style="padding-top:50px;">
       <div class="content">
-        <h1>开心摇摇乐</h1>
+        <h1>星云链开心摇摇乐</h1>
 
         <div>
           <div id="casino1" class="slotMachine" style="margin-left: -65px;">
@@ -51,9 +49,7 @@
 
           <div class="btn-group btn-group-justified" role="group">
             <button id="casinoShuffle" type="button" class="btn btn-primary btn-lg">摇一摇</button>
-          </div>
-          <div>
-            <p id="spinResult"></p>
+            <button id="readme" type="button" class="btn btn-primary btn-lg">规则说明</button>
           </div>
         </div>
       </div>
@@ -63,13 +59,13 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="prizeModalLabel">You win <spin id="winPrize"></spin> nas!</h5>
+              <h5 class="modal-title" id="prizeModalLabel">感谢参与</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
-              It will send to your account by the smart contract. If not, please contact harryge@qq.com.
+              <p id="prizeText">奖金会自动转发到您的钱包地址，交易有延迟。如果一直没有收到，请联系作者<a href="mailto:harryge@qq.com">harryge@qq.com</a>。</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -77,8 +73,37 @@
           </div>
         </div>
       </div>
+
+      <div class="modal fade" id="readmeModal" tabindex="-1" role="dialog" aria-labelledby="readmeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">摇摇乐规则说明</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>0.001NAS摇一次，摇到3个一样的图案即可中奖</p>
+              <p>一等奖 0.007NAS <img src="img/slot6.png"><img src="img/slot6.png"><img src="img/slot6.png"></p>
+              <p>二等奖 0.003NAS <img src="img/slot1.png"><img src="img/slot1.png"><img src="img/slot1.png"></p>
+              <p>二等奖 0.003NAS <img src="img/slot5.png"><img src="img/slot5.png"><img src="img/slot5.png"></p>
+              <p>三等奖 0.002NAS 其他图案</p>
+              <p>刚注册钱包好没有余额玩不了？</p>
+              <p>可以发送邮件到<a href="mailto:harryge@qq.com">harryge@qq.com</a>，在标题中注明“开心摇摇乐NAS领取”，以及钱包地址。</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
     <script id="codeScript5">
+      $('#readme').on('click', function(){
+        $('#readmeModal').modal('show');
+      })
       const btnShuffle = document.querySelector('#casinoShuffle');
       const btnStop = document.querySelector('#casinoStop');
       const casino1 = document.querySelector('#casino1');
@@ -109,7 +134,7 @@
       var intervalQuery;
       //var callbackUrl = NebPay.config.mainnetUrl;
       var callbackUrl = NebPay.config.testnetUrl;
-      var toAddr = "n1gW9fpuvqvZ2suBws2bmq7VY7zma2gYuGZ";
+      var toAddr = "n1iw8rkS7sMjHU4dn46DswZtqzvVSDQzLcU";
       var options = {
           goods: {
               name: "Lucky 7 Slot Machine ",
@@ -138,9 +163,12 @@
                       clearInterval(intervalQuery);
                       stopAll(slots);
                       if(prize > 0) {
-                        document.getElementById("winPrize").innerHTML = prize;
-                        $('#prizeModal').modal('show');
+                        var prizeHead = "恭喜您获得 " + prize + " NAS!"
+                        document.getElementById("prizeModalLabel").innerHTML = prizeHead;
+                      } else {
+                        document.getElementById("prizeText").innerHTML = "差一点点就中奖了哦";
                       }
+                      $('#prizeModal').modal('show');
                     }       
                   }
               })
